@@ -1,4 +1,4 @@
-package com.phoenix.data.model;
+package com.phoenix.data.models;
 
 
 import lombok.Data;
