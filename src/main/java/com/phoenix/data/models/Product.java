@@ -22,7 +22,7 @@ public class Product {
     private int quantity;
     @CreationTimestamp
     private LocalDateTime dateCreated;
-    private String imageURL;
+    private String imageUrl;
 
 
 }
