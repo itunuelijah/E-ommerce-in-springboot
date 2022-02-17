@@ -25,7 +25,7 @@ import java.util.Optional;
 
     @Service
     @Slf4j
-    public class ProductServiceImpl implements ProductService{
+    public class ProductServiceImpl implements ProductService {
 
         @Autowired
         ProductRepository productRepository;
@@ -41,20 +41,18 @@ import java.util.Optional;
         }
 
         @Override
-        public Product findProductById(Long productId) throws ProductDoesNotExistException{
-            if(productId == null){
+        public Product findProductById(Long productId) throws ProductDoesNotExistException {
+            if (productId == null) {
                 throw new IllegalArgumentException("ID cannot be null.");
             }
             Optional<Product> queryResult = productRepository.findById(productId);
-            if(queryResult.isPresent()){
-                return queryResult.get();
-            }
+            if (queryResult.isPresent()) return queryResult.get();
+                throw new ProductDoesNotExistException("Product with ID : " + productId + "does not exist");
 
-            throw new ProductDoesNotExistException("Product with ID :"+productId +": does not exists");
         }
 
         @Override
-        public Product createProduct(ProductDto productDto) throws BusinessLogicException {
+        public Product createProduct(ProductDto productDto) throws BusinessLogicException, IOException {
             //product dto is not null
             if(productDto == null){
                 throw new IllegalArgumentException("Argument cannot be null.");
@@ -92,7 +90,8 @@ import java.util.Optional;
             return productRepository.save(product);
         }
 
-        private Product saveOrUpdate(Product product) throws BusinessLogicException {
+        @Override
+        public Product saveOrUpdate(Product product) throws BusinessLogicException {
             if(product == null){
                 throw new BusinessLogicException("Product cannot be null");
             }
@@ -100,11 +99,15 @@ import java.util.Optional;
         }
 
         @Override
-        public Product updateProductDetails(Long productId, JsonPatch productPatch) throws BusinessLogicException {
-            Optional<Product> productQuery = productRepository.findById(productId);
-            if(productQuery.isEmpty()){
-                throw new BusinessLogicException("Product with ID"+productId+"Does not exists");
-            }
+        public Product updateProductDetails(Long productId, JsonPatch productPatch)
+                throws ProductDoesNotExistException, BusinessLogicException, JsonPatchException, JsonProcessingException {
+                if(productId == null) throw new IllegalArgumentException("ID cannot be null");
+
+
+                Optional<Product> productQuery = productRepository.findById(productId);
+            if(productQuery.isEmpty())
+                throw new ProductDoesNotExistException("Product with ID "+productId+" does not exists");
+
             Product targetProduct = productQuery.get();
 
             try {
@@ -117,8 +120,8 @@ import java.util.Optional;
 
 
         }
-
-        private Product applyPatchToProduct(JsonPatch productPatch, Product targetProduct) throws JsonPatchException, JsonProcessingException {
+        private Product applyPatchToProduct(JsonPatch productPatch, Product targetProduct)
+                throws JsonPatchException, JsonProcessingException {
 
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode patched = productPatch.
