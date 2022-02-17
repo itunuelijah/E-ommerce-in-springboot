@@ -22,7 +22,7 @@ import javax.print.attribute.standard.Media;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/product")
+@RequestMapping("/api/products")
 public class ProductRestController {
 
     @Autowired
